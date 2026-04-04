@@ -11,7 +11,7 @@ Import GitHub issues into beads.
 ## Usage
 
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: github_to_beads.sh
 args: ["--mount", "<mount>", "--repo", "<owner/repo>", "--issue", "<issue_number>"]
 ```

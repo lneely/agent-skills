@@ -12,27 +12,27 @@ Create and control agent sessions.
 
 List sessions:
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: list_sessions.sh
 ```
 
 Create session:
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: create_session.sh
 args: ["--backend", "<backend>", "--cwd", "<cwd>", "--sandbox", "<sandbox>", "--model", "<model>"]
 ```
 
 Control session:
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: control_session.sh
 args: ["--session-id", "<session-id>", "--command", "<stop|restart|kill|refresh>"]
 ```
 
 Spawn agent (requires default sandbox):
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: spawn_agent.sh
 args: ["--agent-id", "<agent-id>", "--cwd", "<cwd-path>", "--prompt", "<initial-context>"]
 sandbox: default
@@ -41,7 +41,7 @@ sandbox: default
 
 Kill agent:
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: kill_agent.sh
 args: ["--agent-id", "<agent-id>"]
 ```

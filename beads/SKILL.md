@@ -10,21 +10,21 @@ description: Manage tasks using the beads 9P interface. Use when creating, updat
 
 Find your project's beads mount:
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: list_mounts.sh
 ```
 Then find the entry matching your cwd and extract the mount name.
 
 If no mount exists, create one (substitute actual path):
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: mount_beads.sh
 args: ["--cwd", "/path/to/project"]
 ```
 
 Initialize beads in a mount (creates .beads/):
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: init_beads.sh
 args: ["--mount", "<mount>", "--prefix", "<prefix>"]
 ```
@@ -37,14 +37,14 @@ All tools require `--mount <mount>`. Exceptions: `list_mounts.sh`, `mount_beads.
 
 List mounts:
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: list_mounts.sh
 sandbox: default
 ```
 
 Wait for a bead on your mount (blocks until one is ready, returns full bead JSON including comments, then exits — bot decides whether to claim):
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: wait_for_bead.sh
 args: ["--mount", "<mount>"]
 sandbox: default
@@ -52,7 +52,7 @@ sandbox: default
 
 List ready beads (open, unblocked):
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: list_ready_beads.sh
 args: ["--mount", "<mount>"]
 sandbox: default
@@ -60,7 +60,7 @@ sandbox: default
 
 List all open beads (excludes closed):
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: list_beads.sh
 args: ["--mount", "<mount>"]
 sandbox: default
@@ -68,14 +68,14 @@ sandbox: default
 
 Search beads by id, title, or description (includes closed):
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: search_beads.sh
 args: ["--mount", "<mount>", "--query", "<query>"]
 ```
 
 Lookup bead by ID:
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: search_beads.sh
 args: ["--mount", "<mount>", "--id", "<id>"]
 ```
@@ -84,7 +84,7 @@ args: ["--mount", "<mount>", "--id", "<id>"]
 
 Read bead JSON:
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: read_bead.sh
 args: ["--mount", "<mount>", "--id", "<id>", "--property", "json"]
 sandbox: default
@@ -92,7 +92,7 @@ sandbox: default
 
 Read bead comments:
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: read_bead_comments.sh
 args: ["--mount", "<mount>", "--id", "<id>"]
 sandbox: default
@@ -102,7 +102,7 @@ sandbox: default
 
 Claim bead:
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: claim_bead.sh
 args: ["--mount", "<mount>", "--id", "<id>"]
 sandbox: default
@@ -110,7 +110,7 @@ sandbox: default
 
 Complete bead:
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: complete_bead.sh
 args: ["--mount", "<mount>", "--id", "<id>"]
 sandbox: default
@@ -118,7 +118,7 @@ sandbox: default
 
 Fail bead:
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: fail_bead.sh
 args: ["--mount", "<mount>", "--id", "<id>", "--reason", "<reason>"]
 sandbox: default
@@ -126,7 +126,7 @@ sandbox: default
 
 Create bead (starts deferred — use open_bead.sh when ready):
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: create_bead.sh
 args: ["--mount", "<mount>", "--title", "<title>", "--desc", "<desc>", "--parent", "<id>"]
 sandbox: default
@@ -135,7 +135,7 @@ sandbox: default
 
 Update bead field:
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: update_bead.sh
 args: ["--mount", "<mount>", "--id", "<id>", "--field", "<field>", "--value", "<value>"]
 sandbox: default
@@ -144,7 +144,7 @@ Valid fields: `title`, `description`, `design`, `acceptance_criteria`, `notes`, 
 
 Open (promote deferred to ready):
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: open_bead.sh
 args: ["--mount", "<mount>", "--id", "<id>"]
 sandbox: default
@@ -152,7 +152,7 @@ sandbox: default
 
 Defer bead:
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: defer_bead.sh
 args: ["--mount", "<mount>", "--id", "<id>"]
 sandbox: default
@@ -161,7 +161,7 @@ Optional: append `"--until", "<RFC3339-time>"` to defer until a specific time.
 
 Reopen closed bead:
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: reopen_bead.sh
 args: ["--mount", "<mount>", "--id", "<id>"]
 sandbox: default
@@ -169,7 +169,7 @@ sandbox: default
 
 Relate two beads (soft link, no blocking):
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: relate_beads.sh
 args: ["--mount", "<mount>", "--bead1", "<id-1>", "--bead2", "<id-2>"]
 sandbox: default
@@ -177,7 +177,7 @@ sandbox: default
 
 Add dependency (child blocked by parent):
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: add_dependency.sh
 args: ["--mount", "<mount>", "--child", "<child>", "--parent", "<parent>"]
 sandbox: default
@@ -185,7 +185,7 @@ sandbox: default
 
 Comment on bead:
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: comment_bead.sh
 args: ["--mount", "<mount>", "--id", "<id>", "--text", "<text>"]
 sandbox: default
@@ -193,7 +193,7 @@ sandbox: default
 
 Label bead:
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: label_bead.sh
 args: ["--mount", "<mount>", "--id", "<id>", "--label", "<label>"]
 sandbox: default
@@ -201,7 +201,7 @@ sandbox: default
 
 Delete bead:
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: delete_bead.sh
 args: ["--mount", "<mount>", "--id", "<id>"]
 sandbox: default
@@ -211,7 +211,7 @@ sandbox: default
 
 Unmount project:
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: umount_beads.sh
 args: ["--mount", "<mount>"]
 sandbox: default
@@ -220,7 +220,7 @@ sandbox: default
 
 Sync project:
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: sync_beads.sh
 args: ["--mount", "<mount>"]
 sandbox: default

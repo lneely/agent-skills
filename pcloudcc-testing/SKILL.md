@@ -70,7 +70,7 @@ Load pcloudcc-testing skill. Test the affected code path with unit tests, fault 
 
 Spawn testing agent:
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: spawn_agent.sh
 args: ["<your-id>", "<cwd>", "<system-prompt-above>"]
 sandbox: default
@@ -78,21 +78,21 @@ sandbox: default
 
 Send test request:
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: send_message.sh
 args: ["<your-id>", "<testing-agent-id>", "PROMPT_REQUEST", "Validate fix", "Bug: <desc>\nFix: <changes>\nFiles: <list>\nBranch: <name>"]
 ```
 
 Read response (user notifies when ready):
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: check_inbox.sh
 args: ["<your-id>"]
 ```
 
 Kill testing agent:
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: kill_agent.sh
 args: ["<testing-agent-id>"]
 ```
@@ -106,7 +106,7 @@ args: ["<testing-agent-id>"]
 5. Verify fix (old fails, new passes)
 6. Report:
 ```
-Tool: execute_code
+Tool: execute_tool
 tool: send_message.sh
 args: ["<your-id>", "<requester-id>", "PROMPT_RESPONSE", "Validation complete", "Status: completed|failed\n<evidence>"]
 ```
