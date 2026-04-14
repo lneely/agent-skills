@@ -38,7 +38,9 @@ args: ["<plan-filename>", "<step-title-substring>"]
 
 ## Notes
 
-- Plan files live in `pl/` under the ollie mount
-- List plans: `file_glob` on `ollie/pl/`
-- Inspect a plan: `file_read` on the plan file
+- Plan files live under `$OLLIE/pl/`
+- List plans: `execute_code` with `ls $OLLIE/pl/`
+- Inspect a plan: `execute_code` with `cat $OLLIE/pl/<file>`
+- Rename/move plans: `execute_code` with `mv $OLLIE/pl/<src> $OLLIE/pl/<dst>`
 - Bulk edits: `file_edit` or `execute_code`
+- `$OLLIE` is always set in the sandbox environment; use it instead of relative paths
