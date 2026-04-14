@@ -6,25 +6,34 @@ description: Guidance on using file_* tools for all file read/write/edit/search 
 
 # File Editing
 
-Use the `file_*` built-in tools for all file operations. Do not use shell commands (`cat`, `sed`, `awk`, `grep`, `find`, `echo >`, etc.) for file I/O — the file tools are faster, safer, and produce better diffs.
+**Always use `file_*` tools for file operations. Never use shell commands for file I/O.**
+
+Using `cat`, `sed`, `awk`, `grep`, `find`, `echo >`, or similar shell commands for reading, writing, or searching files is **wrong**. The `file_*` tools exist precisely to replace them. Use them every time, without exception.
 
 ## Tools
 
-| Tool | Use for |
+| Tool | Replaces |
 |------|---------|
-| `file_read` | Reading a file or a line range |
-| `file_write` | Writing a new file or full overwrite |
-| `file_edit` | Precise string replacement in an existing file |
-| `file_glob` | Finding files by name pattern |
-| `file_grep` | Searching file contents by regex |
+| `file_read` | `cat`, `head`, `tail`, `less` |
+| `file_write` | `echo >`, `tee`, `cat >` |
+| `file_edit` | `sed -i`, `awk`, manual patch |
+| `file_glob` | `find`, `ls` |
+| `file_grep` | `grep`, `rg` |
 
 ## Rules
 
-- Read before writing. Always call `file_read` on a file before `file_write` or `file_edit`.
-- Prefer `file_edit` over `file_write` for partial changes — it sends only the diff.
-- Use `file_glob` instead of `find` or `ls` for file discovery.
-- Use `file_grep` instead of `grep` or `rg` for content search.
-- Reserve `execute_code` for operations that genuinely require a shell (build, test, git, process control).
+- **Read before writing.** Always call `file_read` on a file before `file_write` or `file_edit`. This is enforced — writes will fail without a prior read.
+- **Prefer `file_edit` over `file_write`** for partial changes.
+- **Never use `execute_code` or `execute_tool` for file I/O.** Reserve those for operations that genuinely require a shell: building, testing, git, process control.
+
+## Examples
+
+```
+file_read: {"path": "/abs/path/to/file.go"}
+file_edit: {"path": "/abs/path/to/file.go", "old": "foo()", "new": "bar()"}
+file_glob: {"pattern": "src/**/*.go"}
+file_grep: {"pattern": "func.*Handler", "path": "src/"}
+```
 
 ## Examples
 
