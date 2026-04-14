@@ -34,12 +34,3 @@ file_edit: {"path": "/abs/path/to/file.go", "old": "foo()", "new": "bar()"}
 file_glob: {"pattern": "src/**/*.go"}
 file_grep: {"pattern": "func.*Handler", "path": "src/"}
 ```
-
-## Examples
-
-```
-file_read: {"path": "src/main.go"}
-file_edit: {"path": "src/main.go", "old": "foo()", "new": "bar()"}
-file_glob: {"pattern": "src/**/*.go"}
-file_grep: {"pattern": "func.*Handler", "path": "src/"}
-```
