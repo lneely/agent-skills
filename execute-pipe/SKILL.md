@@ -1,7 +1,7 @@
 ---
 name: execute-pipe
 intent: parallel, pipeline, pipe, fan-out, concurrent, batch, etl, transform, compose
-description: Compose execute_code and execute_tool into sequential pipelines with optional parallel fan-out stages. Use for multi-step data processing, parallel independent operations, and ETL workflows.
+description: Compose execute_code into sequential pipelines with optional parallel fan-out stages using execute_pipe. Use for multi-step data processing, parallel independent operations, and ETL workflows.
 ---
 
 # Execute Pipeline Patterns
@@ -14,9 +14,8 @@ The primitives stay simple. Complexity lives in the data schema and the skill (h
 
 | Tool | What it does |
 |---|---|
-| `execute_code` | Run one or more code snippets. Multiple steps run in parallel; single step returns raw output. |
+| `execute_code` | Run one or more steps. Steps may be inline `{code}` or named `{tool, args}` scripts. Multiple steps run in parallel; single step returns raw output. |
 | `execute_pipe` | Chain stages sequentially, piping stdout → stdin. Each stage: `{code}`, `{tool, args}`, or `{parallel: [steps]}`. |
-| `execute_tool` | Run a named script from `ollie/t`. Used inside `execute_pipe` as a `{tool}` stage. |
 
 ## execute_code: parallel fan-out
 
@@ -120,4 +119,4 @@ If normalization requires multiple steps, extract it as a named tool in `ollie/t
 | N independent operations, same output schema | `execute_code` parallel steps, or `execute_pipe` parallel stage |
 | N operations feeding one transform | `execute_pipe` with parallel first stage |
 | Multi-step data transform | `execute_pipe` sequential stages |
-| Reusable transform logic | `execute_tool` or named script in `ollie/t` |
+| Reusable transform logic | `{tool}` step in `execute_code`, or named script in `ollie/t` as a pipe stage |
