@@ -1,61 +1,47 @@
 ---
 name: execute-pipe
 intent: parallel, pipeline, pipe, fan-out, concurrent, batch, etl, transform, compose
-description: Compose execute_code into sequential pipelines with optional parallel fan-out stages using execute_pipe. Use for multi-step data processing, parallel independent operations, and ETL workflows.
+description: Use execute_code pipeline stages for sequential data processing, parallel fan-out, and ETL workflows.
 ---
 
 # Execute Pipeline Patterns
 
 ## Principle: smart data, dumb code
 
-The primitives stay simple. Complexity lives in the data schema and the skill (here), not in the tools themselves. Design pipelines around data shape, not around clever tool use.
+The primitive stays simple. Complexity lives in the data schema and the skill (here), not in the tool itself. Design pipelines around data shape, not around clever tool use.
 
-## Tools
+## execute_code: the unified primitive
 
-| Tool | What it does |
-|---|---|
-| `execute_code` | Run one or more steps. Steps may be inline `{code}` or named `{tool, args}` scripts. Multiple steps run in parallel; single step returns raw output. |
-| `execute_pipe` | Chain stages sequentially, piping stdout → stdin. Each stage: `{code}`, `{tool, args}`, or `{parallel: [steps]}`. |
+`execute_code` accepts a `steps` array of pipeline stages. Stages run sequentially, each stage's stdout fed to the next stage's stdin. A single stage returning raw output is the degenerate case.
 
-## execute_code: parallel fan-out
-
-Single step — raw output:
-```json
-{"steps": [{"code": "wc -l file.txt"}]}
-```
-
-Multiple steps — run concurrently, results under `=== step N ===` headers:
-```json
-{"steps": [
-  {"code": "wc -l a.txt"},
-  {"code": "wc -l b.txt"},
-  {"tool": "count-lines.sh", "args": ["c.txt"]}
-]}
-```
+Each stage is one of:
+- `{code, language}` — inline code (default: bash)
+- `{tool, args}` — named script from `ollie/t`; language detected from shebang
+- `{parallel: [steps]}` — concurrent fan-out; outputs concatenated in submission order, fed to next stage
 
 Tool steps and inline code steps can be mixed freely. Tool steps are trusted (no pattern validation); inline code steps are validated before execution.
 
 ## Language selection
 
-How the interpreter is chosen depends on step type:
-
 | Step type | How language is determined |
 |---|---|
 | `{code}` | `language` field; defaults to `bash` if absent |
-| `{tool}` | shebang line in the script (`#!/usr/bin/env python3`, etc.); `language` field is ignored |
+| `{tool}` | shebang line in the script; `language` field is ignored |
 
 Supported `language` values for inline code: `bash`, `python3`, `perl`, `lua`, `awk`, `sed`, `jq`, `ed`, `expect`, `bc`.
 
-Do not set `language` on a tool step — it has no effect and will mislead readers of the call.
+## Single stage (degenerate case)
 
-Results are always in submission order, regardless of completion order.
-
-## execute_pipe: sequential pipeline
-
-Each stage's stdout becomes the next stage's stdin.
-
+Raw output, no headers:
 ```json
-{"pipe": [
+{"steps": [{"code": "wc -l file.txt"}]}
+```
+
+## Sequential pipeline
+
+Each stage's stdout becomes the next stage's stdin:
+```json
+{"steps": [
   {"code": "grep ERROR app.log"},
   {"code": "sort"},
   {"code": "uniq -c"}
@@ -64,18 +50,18 @@ Each stage's stdout becomes the next stage's stdin.
 
 Tool stage:
 ```json
-{"pipe": [
+{"steps": [
   {"tool": "fetch-metrics.sh", "args": ["--last=1h"]},
   {"code": "jq '.[] | select(.latency > 500)'"}
 ]}
 ```
 
-## execute_pipe: parallel stage
+## Parallel stage
 
-A `{parallel: [...]}` stage fans out concurrently. Each step is `{code}` or `{tool, args}`. Outputs are concatenated in submission order and fed as a single stream to the next stage.
+A `{parallel: [...]}` stage fans out concurrently. Outputs are concatenated in submission order and fed as a single stream to the next stage:
 
 ```json
-{"pipe": [
+{"steps": [
   {"parallel": [
     {"tool": "fetch-app1.sh"},
     {"tool": "fetch-app2.sh"},
@@ -90,10 +76,10 @@ A `{parallel: [...]}` stage fans out concurrently. Each step is `{code}` or `{to
 
 ## ETL pattern: disparate schemas
 
-When parallel steps produce different output schemas, normalize each before merging. Use an inner pipe as the transform stage.
+When parallel steps produce different output schemas, normalize each before merging:
 
 ```json
-{"pipe": [
+{"steps": [
   {"parallel": [
     {"code": "jq -r '.name' users.json"},
     {"code": "awk -F: '{print $1}' /etc/passwd"}
@@ -103,9 +89,7 @@ When parallel steps produce different output schemas, normalize each before merg
 ]}
 ```
 
-Here both parallel steps produce newline-delimited names (same schema). The `sort -u` stage then deduplicates the merged stream.
-
-If normalization requires multiple steps, extract it as a named tool in `ollie/t` and reference it with `{tool}`.
+If normalization requires multiple steps, extract it as a named tool in `ollie/t`.
 
 ## Timeout
 
@@ -115,8 +99,8 @@ If normalization requires multiple steps, extract it as a named tool in `ollie/t
 
 | Situation | Pattern |
 |---|---|
-| One independent operation | `execute_code` single step |
-| N independent operations, same output schema | `execute_code` parallel steps, or `execute_pipe` parallel stage |
-| N operations feeding one transform | `execute_pipe` with parallel first stage |
-| Multi-step data transform | `execute_pipe` sequential stages |
-| Reusable transform logic | `{tool}` step in `execute_code`, or named script in `ollie/t` as a pipe stage |
+| One independent operation | single stage |
+| N independent operations, same output schema | `{parallel: [...]}` stage |
+| N operations feeding one transform | parallel first stage, then sequential |
+| Multi-step data transform | sequential stages |
+| Reusable transform logic | `{tool}` stage referencing a named script in `ollie/t` |
