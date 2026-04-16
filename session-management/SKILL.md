@@ -68,8 +68,9 @@ Useful for observing what a peer is doing.
 # Last 100 lines of chat history:
 tail -100 ollie/s/{id}/chat
 
-# Most recent reply:
-cat ollie/s/{id}/reply
+# Most recent model response (everything after the last user prompt):
+offset=$(cat ollie/s/{id}/offset)
+tail -c +$((offset + 1)) ollie/s/{id}/chat
 
 # Current state (idle / thinking / calling: <tool>):
 cat ollie/s/{id}/state
