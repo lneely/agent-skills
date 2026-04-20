@@ -34,9 +34,6 @@ result=`split{command}       # split using 'split' instead of $ifs
 if(test -f file) {
     echo exists
 }
-if not {                     # separate statement, new line
-    echo missing
-}
 
 for(i in 1 2 3) { echo $i }
 for(i) { echo $i }           # iterates over $* if no list
@@ -51,24 +48,53 @@ case *
 }
 ```
 
+**`if not` is unreliable** — though documented in the rc manual, `if not` causes syntax errors in practice. Use a flag variable instead:
+
+```
+ok=0
+if(test -f file) { echo exists; ok=1 }
+if(~ $ok 0) echo missing
+```
+
+Chained `if` statements serve as logical AND:
+
+```
+if(test -f file) if(~ $mode rw) echo writable
+```
+
 ## Functions & Pattern Matching
 
 ```
-fn name { echo $* $1 }       # define (all args, first arg)
+fn name {                    # always use multi-line bodies
+    echo $* $1               # $* all args, $1 first arg
+}
 fn name                      # remove definition
 ~ $file *.txt                # pattern match (sets $status)
 if(~ $#list 0) { echo empty }
+```
+
+**Single-line function bodies with `;` cause syntax errors.** Always use multi-line:
+
+```
+# WRONG: fn die { echo $* >[1=2]; exit 1 }
+fn die {
+    echo $* >[1=2]
+    exit 1
+}
 ```
 
 ## Redirection & Pipes
 
 ```
 >out >>out <in <<EOF         # stdout, append, stdin, here doc
->[2]err >[2=1] >[2=]         # fd 2 to file, fd 2 to fd 1, close fd 2
+>[2]err >[2=]                # fd 2 to file, close fd 2
+>[1=2]                       # stdout to stderr (write to stderr)
+>[2=1]                       # stderr to stdout
 <[0=3]                       # fd 0 from fd 3
 <{cmd} >{cmd} <>{cmd}        # process substitution
 cmd1 | cmd2                  # pipe
 |[2] |[1=2]                  # pipe fd 2, pipe fd 2 to fd 1
+{ cmd1; cmd2 } > file        # redirect block stdout to file
 ```
 
 ## Operators
@@ -88,10 +114,11 @@ cmd1 | cmd2                  # pipe
 
 - Backticks `{cmd}`, not `$(cmd)`
 - Lists `(a b c)`, 1-indexed
-- `if not` on new line
+- No reliable `if/else`: use flag variable + chained `if` instead of `if not`
 - `test` or `~`, not `[[ ]]`
 - `$#var` not `${#var}`, `$"var` not `"$*"`
-- `>[2=1]` not `2>&1`
+- `>[1=2]` to write to stderr (stdout→stderr), `>[2=1]` for stderr→stdout
+- `>[2]file` redirects fd 2 to a file; bare `>[2]` (no filename) is a syntax error
 - No `${var:-default}`
 - `fn name` not `function name`
 - Single quotes only (double quotes not special)
