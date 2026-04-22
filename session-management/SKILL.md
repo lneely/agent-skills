@@ -57,7 +57,7 @@ echo "your prompt here" > ollie/s/{id}/prompt
 
 To queue work for after the current turn completes:
 ```bash
-echo "your prompt here" > ollie/s/{id}/enqueue
+echo "your prompt here" > ollie/s/{id}/fifo.in
 ```
 
 ## Read session state
